@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _ from "lodash";
 import { getMovies } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 import MoviesTable from "./moviesTable.jsx";
@@ -10,10 +11,10 @@ class Movies extends Component {
     state = {
         movies: [],
         genres: [],
-        selectedGenre: [],
+        // selectedGenre: [],
         pageSize: 4, //show the movie per page
         currentPage: 1,
-        sortColumn: { path: "title", direction: true }
+        sortColumn: { path: "title", order: "desc" }
     };
 
     componentDidMount() {
@@ -37,8 +38,6 @@ class Movies extends Component {
         });
     };
 
-    handleSort = () => {};
-
     handlePageChange = pageNum => {
         this.setState({ currentPage: pageNum });
     };
@@ -47,23 +46,34 @@ class Movies extends Component {
         this.setState({ selectedGenre: genre, currentPage: 1 });
     };
 
+    handleSort = sortColumn => {
+        console.log("onClick");
+        this.setState({ sortColumn });
+    };
+
     render() {
         const { length: count } = this.state.movies; //將 this.state.movie.length 轉換成左方ES6敘述，並將變數 length 轉換為 count
-        const { pageSize, currentPage, movies, selectedGenre, genres } = this.state;
-        const { path, direction } = this.state.sortColumn;
+        const {
+            pageSize,
+            currentPage,
+            movies,
+            selectedGenre,
+            genres,
+            sortColumn
+        } = this.state;
 
         if (count === 0) {
             //使用上方定義的變數 count
             return <p>There's no movies in database.</p>;
         }
 
-        const filteredMovies =
+        const filteredMovies = //選取分類時的影片清單
             selectedGenre && selectedGenre._id
                 ? movies.filter(m => m.genre._id === selectedGenre._id)
                 : movies;
 
-        const currentMovies = Paginate(filteredMovies, currentPage, pageSize);
-        console.log(currentMovies);
+        const sorted = _.orderBy(filteredMovies, [sortColumn.path], [sortColumn.order]);
+        const currentMovies = Paginate(sorted, currentPage, pageSize);
 
         return (
             // 使用 React.Fragment 包起 child element 就不會顯示多餘的 div
@@ -82,6 +92,7 @@ class Movies extends Component {
                         onLike={this.handleLiked}
                         onDelete={this.handleDelete}
                         onSort={this.handleSort}
+                        sortColumn={sortColumn}
                     />
                     <Pagination
                         itemsCount={filteredMovies.length}
