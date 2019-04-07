@@ -5,7 +5,6 @@ import MoviesTable from "./moviesTable.jsx";
 import Pagination from "./common/pagination";
 import Paginate from "../utilitys/paginate.jsx";
 import ListGenre from "../components/common/listGenre.jsx";
-import SortedMovies from "../utilitys/sortedMovies.jsx";
 
 class Movies extends Component {
     state = {
@@ -38,17 +37,7 @@ class Movies extends Component {
         });
     };
 
-    handleSort = path => {
-        const { direction: preDirection, path: prePath } = this.state.sortColumn;
-        let direction = preDirection;
-        if (path === prePath) {
-            direction = !direction;
-        } else {
-            direction = true;
-        }
-        this.setState({ sortColumn: { path, direction } });
-        console.log(direction);
-    };
+    handleSort = () => {};
 
     handlePageChange = pageNum => {
         this.setState({ currentPage: pageNum });
@@ -73,8 +62,6 @@ class Movies extends Component {
                 ? movies.filter(m => m.genre._id === selectedGenre._id)
                 : movies;
 
-        const sortedMovies = SortedMovies(path, direction, filteredMovies);
-        console.log(sortedMovies);
         const currentMovies = Paginate(filteredMovies, currentPage, pageSize);
         console.log(currentMovies);
 
