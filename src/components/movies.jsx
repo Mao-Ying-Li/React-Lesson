@@ -14,7 +14,7 @@ class Movies extends Component {
         // selectedGenre: [],
         pageSize: 4, //show the movie per page
         currentPage: 1,
-        sortColumn: { path: "title", order: "desc" }
+        sortColumn: { path: "title", order: "asc" }
     };
 
     componentDidMount() {
