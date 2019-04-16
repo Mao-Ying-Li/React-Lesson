@@ -51,22 +51,8 @@ class Movies extends Component {
         this.setState({ sortColumn });
     };
 
-    render() {
-        const { length: count } = this.state.movies; //將 this.state.movie.length 轉換成左方ES6敘述，並將變數 length 轉換為 count
-        const {
-            pageSize,
-            currentPage,
-            movies,
-            selectedGenre,
-            genres,
-            sortColumn
-        } = this.state;
-
-        if (count === 0) {
-            //使用上方定義的變數 count
-            return <p>There's no movies in database.</p>;
-        }
-
+    getPageData = () => {
+        const { pageSize, currentPage, movies, selectedGenre, sortColumn } = this.state;
         const filteredMovies = //選取分類時的影片清單
             selectedGenre && selectedGenre._id
                 ? movies.filter(m => m.genre._id === selectedGenre._id)
@@ -74,6 +60,19 @@ class Movies extends Component {
 
         const sorted = _.orderBy(filteredMovies, [sortColumn.path], [sortColumn.order]);
         const currentMovies = Paginate(sorted, currentPage, pageSize);
+
+        return { totalCount: filteredMovies.length, data: currentMovies };
+    };
+
+    render() {
+        const { length: count } = this.state.movies; //將 this.state.movie.length 轉換成左方ES6敘述，並將變數 length 轉換為 count
+        const { pageSize, currentPage, selectedGenre, genres, sortColumn } = this.state;
+
+        if (count === 0) {
+            return <p>There's no movies in database.</p>;
+        }
+
+        const { totalCount, data: currentMovies } = this.getPageData();
 
         return (
             // 使用 React.Fragment 包起 child element 就不會顯示多餘的 div
@@ -86,7 +85,7 @@ class Movies extends Component {
                     />
                 </div>
                 <div className="col">
-                    <p>Showing {filteredMovies.length} movies in the database.</p>
+                    <p>Showing {totalCount} movies in the database.</p>
                     <MoviesTable
                         currentMovies={currentMovies}
                         onLike={this.handleLiked}
@@ -95,7 +94,7 @@ class Movies extends Component {
                         sortColumn={sortColumn}
                     />
                     <Pagination
-                        itemsCount={filteredMovies.length}
+                        itemsCount={totalCount}
                         pageSize={pageSize}
                         currentPage={currentPage}
                         onPageChange={this.handlePageChange}

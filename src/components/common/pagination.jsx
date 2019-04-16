@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const Pagination = props => {
-    const { itemsCount, pageSize, currentPage, onPageChange } = props;
+const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange }) => {
     const pagesCount = Math.ceil(itemsCount / pageSize);
 
     if (pagesCount === 1) return null; // if total pages only has 1, than turn off the pagination
