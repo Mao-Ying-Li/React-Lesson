@@ -12,23 +12,41 @@ class LoginForm extends Component {
     };
 
     schema = {
-        userman: Joi.string().required(),
-        password: Joi.string().required()
+        username: Joi.string()
+            .required()
+            .label("Username"),
+        password: Joi.string()
+            .required()
+            .label("Password")
     };
 
     validate = () => {
-        const errors = {};
-        const { account } = this.state;
-        if (account.username.trim() === "") errors.username = "Username is required.";
-        if (account.password.trim() === "") errors.password = "Password is required.";
+        // Joi 的 validate 功能 validate(value,schema,[function],[callback])
+        // abortEarly default 是true，在遇到第一個error時就會停止validate，如果設定false，會在全部驗證完後才停止
+        const option = { abortEarly: false };
+        const result = Joi.validate(this.state.account, this.schema, option);
+        console.log(result);
 
-        return Object.keys(errors).length === 0 ? null : errors;
+        if (!result.error) return null;
+
+        const errors = {};
+        for (let item of result.error.details) errors[item.path[0]] = item.message;
+        //這裡 errors[item.path[0]] = "username" 或 "password"      可以查看 console.log(result)
+        return errors;
+
+        //這是土炮的作法
+        // const errors = {};
+        // const { account } = this.state;
+        // if (account.username.trim() === "") errors.username = "Username is required.";
+        // if (account.password.trim() === "") errors.password = "Password is required.";
+
+        // return Object.keys(errors).length === 0 ? null : errors;
     };
 
     handleSubmit = e => {
         e.preventDefault();
         const errors = this.validate();
-        console.log(errors);
+        // console.log(errors);
         this.setState({ errors: errors || {} }); //如果 errors == null 則show empty object {}
         if (errors) return; //如果有 error 就不再讓程式繼續往下
 
