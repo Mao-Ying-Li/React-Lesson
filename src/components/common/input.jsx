@@ -9,14 +9,14 @@ class Input extends Component {
     };
 
     render() {
-        const { name, label, value, onChange, error } = this.props;
+        const { type, name, label, value, onChange, error } = this.props;
         return (
             <div className="form-group">
                 <label htmlFor={name}>{label}</label>
                 <input
                     // autoFocus //html5 有 autofocus 這個 attribute 可以在網頁一開始就 focus 在 這個 input 表單上
                     ref={this.username}
-                    type="text"
+                    type={type}
                     className="form-control"
                     id={name}
                     name={name}

@@ -1,12 +1,7 @@
 import React, { Component } from "react";
 import Joi from "joi-browser";
-
+import Input from "../common/input.jsx";
 class Form extends Component {
-    state = {
-        data: {},
-        error: {}
-    };
-
     validate = () => {
         // Joi 的 validate 功能 validate(value,schema,[function],[callback])
         // abortEarly default 是true，在遇到第一個error時就會停止validate，如果設定false，會在全部驗證完後才停止
@@ -47,12 +42,11 @@ class Form extends Component {
 
     handleSubmit = e => {
         e.preventDefault();
+        console.log("submitted"); //如果沒有 error 就送出表單
         const errors = this.validate();
         // console.log(errors);
         this.setState({ errors: errors || {} }); //如果 errors == null 則show empty object {}
         if (errors) return; //如果有 error 就不再讓程式繼續往下
-
-        console.log("submitted"); //如果沒有 error 就送出表單
     };
 
     handleChange = ({ currentTarget: input }) => {
@@ -68,6 +62,32 @@ class Form extends Component {
         /** 在 js 中，如果要讓 object 更加動態，我們可以使用 [] 來動態加入 key，上例我們已經在 input 元件中加入了 name attribute
         這樣可以在鍵入任何數值的時候監聽 e.currentTarget.name 來動態新增 e.currentTarget.value */
         this.setState({ data, errors });
+    };
+
+    renderInput = (name, label, type = "text") => {
+        const { data, errors } = this.state;
+        return (
+            <Input
+                type={type}
+                name={name}
+                label={label}
+                value={data[name]}
+                onChange={this.handleChange}
+                error={errors[name]}
+            />
+        );
+    };
+
+    renderButton = label => {
+        return (
+            <button
+                // 每次在輸入表單的時候都會從 this.validate() return 值
+                //如果表單驗證無誤會為傳 null（null 相對等於 false），如果驗證錯誤會回傳error的資訊，就會等於true，所以button 的 disable 會被開啟
+                disabled={this.validate()}
+                className="btn btn-primary">
+                {label}
+            </button>
+        );
     };
 }
 
