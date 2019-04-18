@@ -6,6 +6,7 @@ import MoviesTable from "./moviesTable.jsx";
 import Pagination from "./common/pagination";
 import Paginate from "../utilitys/paginate.jsx";
 import ListGenre from "../components/common/listGenre.jsx";
+import { Link } from "react-router-dom";
 
 class Movies extends Component {
     state = {
@@ -85,6 +86,9 @@ class Movies extends Component {
                     />
                 </div>
                 <div className="col">
+                    <Link to="/movies/new" className="btn btn-primary mb-4">
+                        New Movie
+                    </Link>
                     <p>Showing {totalCount} movies in the database.</p>
                     <MoviesTable
                         currentMovies={currentMovies}
