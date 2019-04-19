@@ -7,6 +7,7 @@ import Pagination from "./common/pagination";
 import Paginate from "../utilitys/paginate.jsx";
 import ListGenre from "../components/common/listGenre.jsx";
 import { Link } from "react-router-dom";
+import SearchBox from "./common/searchBox";
 
 class Movies extends Component {
     state = {
@@ -15,6 +16,8 @@ class Movies extends Component {
         // selectedGenre: [],
         pageSize: 4, //show the movie per page
         currentPage: 1,
+        selectedGenre: null,
+        searchQuery: "",
         sortColumn: { path: "title", order: "asc" }
     };
 
@@ -44,7 +47,11 @@ class Movies extends Component {
     };
 
     handleGenreSelect = genre => {
-        this.setState({ selectedGenre: genre, currentPage: 1 });
+        this.setState({ selectedGenre: genre, searchQuery: "", currentPage: 1 });
+    };
+
+    handleSearch = query => {
+        this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
     };
 
     handleSort = sortColumn => {
@@ -53,11 +60,25 @@ class Movies extends Component {
     };
 
     getPageData = () => {
-        const { pageSize, currentPage, movies, selectedGenre, sortColumn } = this.state;
-        const filteredMovies = //選取分類時的影片清單
-            selectedGenre && selectedGenre._id
-                ? movies.filter(m => m.genre._id === selectedGenre._id)
-                : movies;
+        const {
+            pageSize,
+            currentPage,
+            movies,
+            selectedGenre,
+            searchQuery,
+            sortColumn
+        } = this.state;
+
+        let filteredMovies = movies;
+        if (searchQuery) {
+            /**  if searchQuery == true(it's means you are input some value in searchBox), 
+            than filter movies include searchQuery string*/
+            filteredMovies = movies.filter(m =>
+                m.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        } else if (selectedGenre && selectedGenre._id) {
+            filteredMovies = movies.filter(m => m.genre._id === selectedGenre._id);
+        }
 
         const sorted = _.orderBy(filteredMovies, [sortColumn.path], [sortColumn.order]);
         const currentMovies = Paginate(sorted, currentPage, pageSize);
@@ -67,7 +88,14 @@ class Movies extends Component {
 
     render() {
         const { length: count } = this.state.movies; //將 this.state.movie.length 轉換成左方ES6敘述，並將變數 length 轉換為 count
-        const { pageSize, currentPage, selectedGenre, genres, sortColumn } = this.state;
+        const {
+            pageSize,
+            currentPage,
+            selectedGenre,
+            genres,
+            sortColumn,
+            searchQuery
+        } = this.state;
 
         if (count === 0) {
             return <p>There's no movies in database.</p>;
@@ -90,6 +118,7 @@ class Movies extends Component {
                         New Movie
                     </Link>
                     <p>Showing {totalCount} movies in the database.</p>
+                    <SearchBox value={searchQuery} onChange={this.handleSearch} />
                     <MoviesTable
                         currentMovies={currentMovies}
                         onLike={this.handleLiked}

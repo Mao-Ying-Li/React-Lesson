@@ -8,7 +8,6 @@ class Form extends Component {
         // abortEarly default 是true，在遇到第一個error時就會停止validate，如果設定false，會在全部驗證完後才停止
         const option = { abortEarly: false };
         const result = Joi.validate(this.state.data, this.schema, option);
-        console.log(result);
         if (!result.error) return null; //result.error 在表單驗證都正確的時候 value 就會是 null
         const errors = {};
         for (let item of result.error.details) errors[item.path[0]] = item.message;
